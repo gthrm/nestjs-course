@@ -31,7 +31,7 @@ export class TopAdvantage {
 }
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
-export interface ReviewModel extends Base {}
+export interface TopPageModel extends Base {}
 export class TopPageModel extends TimeStamps {
   @prop({ enum: TopLevelCategory })
   firstCategory: TopLevelCategory;

@@ -4,9 +4,14 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { CreateReviewDto } from 'src/review/dto/create-review.dto';
 import { Types, disconnect } from 'mongoose';
+import { AuthDto } from 'src/auth/dto/auth.dto';
 
 const productId = new Types.ObjectId().toHexString();
-console.log('productId', productId);
+
+const loginDto: AuthDto = {
+  login: 'ololololol@lol.lol',
+  password: 'ohlol',
+};
 
 const testDto: CreateReviewDto = {
   name: 'Test',
@@ -19,6 +24,8 @@ const testDto: CreateReviewDto = {
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let createdId: string;
+  let token: string;
+
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -26,6 +33,11 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+
+    const { body } = await request(app.getHttpServer())
+      .post('/auth/sign_in')
+      .send(loginDto);
+    token = body.access_token;
   });
 
   it('/review/create (POST) - succeed', async () => {
@@ -49,18 +61,20 @@ describe('AppController (e2e)', () => {
       });
   });
 
-  it('/review/byProduct/:productId (GET) - succeed', async () =>
+  it('/review/by_product/:productId (GET) - succeed', async () =>
     request(app.getHttpServer())
-      .get(`/review/byProduct/${productId}`)
+      .get(`/review/by_product/${productId}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }: request.Response) => {
         expect(body.length).toBe(1);
         expect(body[0]._id).toEqual(createdId);
       }));
 
-  it('/review/byProduct/:productId (GET) - failed', async () =>
+  it('/review/by_product/:productId (GET) - failed', async () =>
     request(app.getHttpServer())
-      .get(`/review/byProduct/${new Types.ObjectId().toHexString()}`)
+      .get(`/review/by_product/${new Types.ObjectId().toHexString()}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }: request.Response) => {
         expect(body.length).toBe(0);
@@ -68,11 +82,15 @@ describe('AppController (e2e)', () => {
       }));
 
   it('/review/:id (DELETE) - succeed', () =>
-    request(app.getHttpServer()).delete(`/review/${createdId}`).expect(200));
+    request(app.getHttpServer())
+      .delete(`/review/${createdId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200));
 
   it('/review/:id (DELETE) - failed', () =>
     request(app.getHttpServer())
       .delete(`/review/${new Types.ObjectId().toHexString()}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(404));
 
   afterAll(() => {

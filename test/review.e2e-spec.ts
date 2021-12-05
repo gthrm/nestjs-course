@@ -2,15 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { CreateReviewDto } from 'src/review/dto/create-review.dto';
+import { CreateReviewDto } from '../src/review/dto/create-review.dto';
 import { Types, disconnect } from 'mongoose';
-import { AuthDto } from 'src/auth/dto/auth.dto';
+import { AuthDto } from '../src/auth/dto/auth.dto';
+import { REVIEW_NOT_MUST_BE_LESS_ONE } from '../src/review/review.constants';
 
 const productId = new Types.ObjectId().toHexString();
 
 const loginDto: AuthDto = {
-  login: 'ololololol@lol.lol',
-  password: 'ohlol',
+  login: 'user',
+  password: 'user@user.com',
 };
 
 const testDto: CreateReviewDto = {
@@ -57,7 +58,7 @@ describe('AppController (e2e)', () => {
       .send({ ...testDto, rating: 0 })
       .expect(400)
       .then(({ body }: request.Response) => {
-        console.log('body', body);
+        expect(body.message[0]).toBe(REVIEW_NOT_MUST_BE_LESS_ONE);
       });
   });
 

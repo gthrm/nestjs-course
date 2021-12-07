@@ -10,6 +10,8 @@ import { TypegooseModule } from 'nestjs-typegoose';
 import { getMongoConfig } from './configs/mongo.config';
 import { FilesModule } from './files/files.module';
 import { SitemapModule } from './sitemap/sitemap.module';
+import { TBotModule } from './t-bot/t-bot.module';
+import { getTBotConfig } from './configs/t-bot.config';
 
 @Module({
   imports: [
@@ -25,6 +27,11 @@ import { SitemapModule } from './sitemap/sitemap.module';
     ReviewModule,
     FilesModule,
     SitemapModule,
+    TBotModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: getTBotConfig,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

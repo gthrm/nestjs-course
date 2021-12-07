@@ -17,15 +17,27 @@ import { UserEmail } from '../decorators/user-email.decorator';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { REVIEW_NOT_FOUND } from './review.constants';
 import { ReviewService } from './review.service';
+import { TBotService } from 'src/t-bot/t-bot.service';
 
 @Controller('review')
 export class ReviewController {
-  constructor(private readonly reviewService: ReviewService) {}
+  constructor(
+    private readonly reviewService: ReviewService,
+    private readonly tBotService: TBotService,
+  ) {}
 
   @UsePipes(new ValidationPipe())
   @Post('create')
   async create(@Body() dto: CreateReviewDto) {
     return this.reviewService.create(dto);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('notify')
+  async notify(@Body() dto: CreateReviewDto) {
+    const { name, title, description, rating, productId } = dto;
+    const message = `Name: ${name}\nTitle: ${title}\nDescription: ${description}\nRating: ${rating}\nProduct Id: ${productId}`;
+    return this.tBotService.sendMessage(message);
   }
 
   @UseGuards(JwtAuthGuard)

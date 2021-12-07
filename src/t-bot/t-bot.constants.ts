@@ -1,0 +1,1 @@
+export const T_BOT_MODULE_OPTIONS = 'T_BOT_MODULE_OPTIONS';

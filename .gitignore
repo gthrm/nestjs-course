@@ -39,3 +39,7 @@ lerna-debug.log*
 
 # CLINIC JS
 .clinic
+
+# Uploads
+
+uploads

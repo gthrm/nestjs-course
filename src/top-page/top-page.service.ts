@@ -28,39 +28,21 @@ export class TopPageService {
   }
 
   async findByFirstCategory(firstCategory: TopLevelCategory) {
-    return (
-      this.topPageService
-        .aggregate()
-        .match({ firstCategory })
-        .group({
-          _id: {
-            secondCategory: '$secondCategory',
+    return this.topPageService
+      .aggregate()
+      .match({ firstCategory })
+      .group({
+        _id: {
+          secondCategory: '$secondCategory',
+        },
+        pages: {
+          $push: {
+            alias: '$alias',
+            title: '$title',
           },
-          pages: {
-            $push: {
-              alias: '$alias',
-              title: '$title',
-            },
-          },
-        })
-        // .aggregate([
-        //   { $match: { firstCategory } },
-        //   {
-        //     $group: {
-        //       _id: {
-        //         secondCategory: '$secondCategory',
-        //       },
-        //       pages: {
-        //         $push: {
-        //           alias: '$alias',
-        //           title: '$title',
-        //         },
-        //       },
-        //     },
-        //   },
-        // ])
-        .exec()
-    );
+        },
+      })
+      .exec();
     // .find({ firstCategory }, { alias: 1, title: 1, secondCategory: 1 })
     // .exec();
   }
@@ -73,5 +55,9 @@ export class TopPageService {
     return this.topPageService
       .find({ $text: { $search: text, $caseSensitive: false } })
       .exec();
+  }
+
+  async findAll() {
+    return this.topPageService.find({}).exec();
   }
 }

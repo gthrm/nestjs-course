@@ -60,4 +60,12 @@ export class TopPageService {
   async findAll() {
     return this.topPageService.find({}).exec();
   }
+
+  async sleep(time = 1000) {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, time);
+    });
+  }
 }

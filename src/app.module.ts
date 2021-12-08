@@ -12,9 +12,12 @@ import { FilesModule } from './files/files.module';
 import { SitemapModule } from './sitemap/sitemap.module';
 import { TBotModule } from './t-bot/t-bot.module';
 import { getTBotConfig } from './configs/t-bot.config';
+import { IpApiModule } from './ip-api/ip-api.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     TypegooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -32,6 +35,7 @@ import { getTBotConfig } from './configs/t-bot.config';
       inject: [ConfigService],
       useFactory: getTBotConfig,
     }),
+    IpApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
